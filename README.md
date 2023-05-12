@@ -29,8 +29,8 @@ codzilla@hogwarts:~/Projects/paxos-playground$ ./paxos_exec
 ## Sample Run
 
 ```console
-codzilla@hogwarts:~/Projects/paxos-playground$ ./build.sh
-codzilla@hogwarts:~/Projects/paxos-playground$ ./paxos_exec
+codzilla@hogwarts:~/Projects/paxos$ ./build.sh
+codzilla@hogwarts:~/Projects/paxos$ ./paxos_exec
 Created Node with id: 1 , Generation Clock value: 0
 Created Node with id: 2 , Generation Clock value: 1
 Created Node with id: 3 , Generation Clock value: 2
@@ -42,7 +42,6 @@ Paxos consensus not achieved yet...
 { node_id: 2, proposed_value: bob } PROPOSED { node_id: 1, proposed_value: alice }
 { node_id: 1, proposed_value: alice } PROMISED { node_id: 2, proposed_value: bob }
 { node_id: 1, proposed_value: alice } PROPOSED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } PROMISED { node_id: 1, proposed_value: alice }
 { node_id: 2, proposed_value: bob } PROPOSED { node_id: 2, proposed_value: bob }
 Paxos consensus not achieved yet...
 Paxos consensus not achieved yet...
@@ -51,41 +50,52 @@ Paxos consensus not achieved yet...
 { node_id: 1, proposed_value: alice } PROPOSED { node_id: 3 }
 { node_id: 3 } PROMISED { node_id: 1, proposed_value: alice }
 Paxos consensus not achieved yet...
-{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 3 }
-{ node_id: 3 } PROMISED { node_id: 2, proposed_value: bob }
 { node_id: 1, proposed_value: alice } PROPOSED { node_id: 5 }
 { node_id: 5 } PROMISED { node_id: 1, proposed_value: alice }
+{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 3 }
+{ node_id: 3 } PROMISED { node_id: 2, proposed_value: bob }
 Paxos consensus not achieved yet...
-Paxos consensus not achieved yet...
-{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 5 }
-{ node_id: 5 } PROMISED { node_id: 2, proposed_value: bob }
-{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 4 }
-{ node_id: 4 } PROMISED { node_id: 2, proposed_value: bob }
-{ node_id: 2, proposed_value: bob } achieved quoram in PROPOSE phase. Moving to ACCEPT phase
 Paxos consensus not achieved yet...
 { node_id: 1, proposed_value: alice } PROPOSED { node_id: 4 }
 { node_id: 4 } PROMISED { node_id: 1, proposed_value: alice }
 { node_id: 1, proposed_value: alice } achieved quoram in PROPOSE phase. Moving to ACCEPT phase
+{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 2, proposed_value: bob }
+{ node_id: 2, proposed_value: bob } ACCEPTED { node_id: 1, proposed_value: alice }
+Paxos consensus not achieved yet...
+{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 5 }
+{ node_id: 5 } PROMISED { node_id: 2, proposed_value: bob }
+Paxos consensus not achieved yet...
+{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 3 }
+{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 5 }
+Paxos consensus not achieved yet...
+{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 4 }
+{ node_id: 4 } ACCEPTED { node_id: 1, proposed_value: alice }
+{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 4 }
+{ node_id: 2, proposed_value: bob } achieved quoram in PROPOSE phase. Moving to ACCEPT phase
+Paxos consensus not achieved yet...
+Paxos consensus not achieved yet...
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 1, proposed_value: alice }
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 2, proposed_value: bob }
 Paxos consensus not achieved yet...
 { node_id: 2, proposed_value: bob } requested ACCEPT from { node_id: 1, proposed_value: alice }
 { node_id: 1, proposed_value: alice } ACCEPTED { node_id: 2, proposed_value: bob }
+Paxos consensus not achieved yet...
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 3 }
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 5 }
+Paxos consensus not achieved yet...
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 4 }
+Paxos consensus not achieved yet...
 { node_id: 2, proposed_value: bob } requested ACCEPT from { node_id: 3 }
 { node_id: 3 } ACCEPTED { node_id: 2, proposed_value: bob }
 Paxos consensus not achieved yet...
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 1, proposed_value: alice }
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 2, proposed_value: bob }
+Paxos consensus not achieved yet...
+Paxos consensus not achieved yet...
 { node_id: 2, proposed_value: bob } requested ACCEPT from { node_id: 5 }
 { node_id: 5 } ACCEPTED { node_id: 2, proposed_value: bob }
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 1, proposed_value: alice }
-Paxos consensus not achieved yet...
-Paxos consensus not achieved yet...
-{ node_id: 2, proposed_value: bob } requested ACCEPT from { node_id: 4 }
-{ node_id: 4 } ACCEPTED { node_id: 2, proposed_value: bob }
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 3 }
 Paxos consensus achieved; value committed: bob
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 2, proposed_value: bob }
-{ node_id: 2, proposed_value: bob } ACCEPTED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 3 }
-{ node_id: 3 } ACCEPTED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 5 }
-{ node_id: 5 } ACCEPTED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 4 }
-{ node_id: 4 } ACCEPTED { node_id: 1, proposed_value: alice }
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 5 }
+{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 4 }
 ```
