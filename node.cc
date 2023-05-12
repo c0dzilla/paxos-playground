@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <iostream>
+#include <thread>
 #include <vector>
 #include "node.h"
 #include "node_registry.h"
@@ -11,6 +12,7 @@ using ::std::make_pair;
 using ::std::make_shared;
 using ::std::shared_ptr;
 using ::std::string;
+using ::std::thread;
 using ::std::vector;
 
 namespace paxos {
@@ -168,8 +170,18 @@ int main() {
   const auto& node4 = paxos::NodeRegistry::Register(4);
   const auto& node5 = paxos::NodeRegistry::Register(5);
 
-  node1->SetProposalValue("alice");
-  node1->Propose();
+  thread proposer1([node1] {
+    node1->SetProposalValue("alice");
+    node1->Propose();
+  });
+
+  thread proposer2([node2] {
+    node2->SetProposalValue("bob");
+    node2->Propose();
+  });
+
+  proposer1.join();
+  proposer2.join();
 
   const auto& committedValue = paxos::NodeRegistry::GetCommittedValue();
 
