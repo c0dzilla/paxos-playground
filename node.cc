@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <chrono>
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -6,12 +7,14 @@
 #include "node_registry.h"
 
 using ::std::atomic_int;
+using ::std::chrono::seconds;
 using ::std::cout;
 using ::std::endl;
 using ::std::make_pair;
 using ::std::make_shared;
 using ::std::shared_ptr;
 using ::std::string;
+using ::std::this_thread::sleep_for;
 using ::std::thread;
 using ::std::vector;
 
@@ -84,6 +87,9 @@ namespace paxos {
 
   shared_ptr<Promise> Node::HandleProposal(shared_ptr<Node> proposer,
       Proposal proposal) {
+    // Simulate random network delay.
+    sleep_for(seconds(GenerationClock::Get() % 7));
+
     if (!promised_generation_) {
       return make_shared<Promise>(true, nullptr);
     }
@@ -129,6 +135,8 @@ namespace paxos {
 
   shared_ptr<AcceptResponse> Node::HandleAcceptReq(
       shared_ptr<Node> acceptRequester, AcceptReq acceptReq) {
+    // Simulate random network delay.
+    sleep_for(seconds(GenerationClock::Get() % 7));
     // Accept the request if its generation is >= the highest generation that
     // has been promised so far. Theoretically, checking for = should be
     // sufficient, since the accept request's generation cannot be higher than
@@ -170,6 +178,18 @@ int main() {
   const auto& node4 = paxos::NodeRegistry::Register(4);
   const auto& node5 = paxos::NodeRegistry::Register(5);
 
+  thread consensusChecker([] {
+    shared_ptr<string> committedValue = nullptr;
+
+    while (!committedValue) {
+      cout << "Paxos consensus not achieved yet..." << endl;
+      sleep_for(seconds(1));
+      committedValue = paxos::NodeRegistry::GetCommittedValue();
+    }
+    cout << "Paxos consensus achieved; value committed: " << *committedValue
+        << endl;
+  });
+
   thread proposer1([node1] {
     node1->SetProposalValue("alice");
     node1->Propose();
@@ -180,16 +200,9 @@ int main() {
     node2->Propose();
   });
 
+  consensusChecker.join();
   proposer1.join();
   proposer2.join();
 
-  const auto& committedValue = paxos::NodeRegistry::GetCommittedValue();
-
-  if (!committedValue) {
-    cout << "Paxos consensus not achieved" << endl;
-  } else {
-    cout << "Paxos consensus achieved; value committed: " << *committedValue
-        << endl;
-  }
   return 0;
 }
