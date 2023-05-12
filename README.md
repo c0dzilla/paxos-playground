@@ -13,7 +13,7 @@ A zero-setup, zero-dependency, single-process implemention of the Paxos algorith
 
 1. Compile:
 ```
-./run.sh
+./build.sh
 ```
 2. Run:
 ```
