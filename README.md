@@ -1,6 +1,6 @@
 # Paxos Playground
 
-A zero-setup, zero-dependency, single-process implemention of the Paxos algorithm for distributed consensus amongst a cluster of cooperating nodes. This is meant to serve as a playground to simulate Paxos runs with different configurations (number of nodes, number of proposers, network conditions, etc) without any setup overhead.
+A zero-setup, zero-dependency, single-process implementation of the Paxos algorithm for distributed consensus amongst a cluster of cooperating nodes. This is meant to serve as a playground to simulate Paxos runs with different configurations (number of nodes, number of proposers, network conditions, etc) without any setup overhead.
 
 ## Features
 
