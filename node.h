@@ -57,6 +57,8 @@ namespace paxos {
     public:
      Node(int node_id);
 
+     std::string ToString();
+
      void SetProposalValue(std::string value);
 
      void Propose();

@@ -16,6 +16,7 @@ using ::std::shared_ptr;
 using ::std::string;
 using ::std::this_thread::sleep_for;
 using ::std::thread;
+using ::std::to_string;
 using ::std::vector;
 
 namespace paxos {
@@ -27,6 +28,15 @@ namespace paxos {
     generation_clock_val_ = GenerationClock::Get();
     cout << "Created Node with id: " << node_id <<
         " , Generation Clock value: " << generation_clock_val_ << std::endl;
+  }
+
+
+  string Node::ToString() {
+    if (proposal_) {
+      return "{ node_id: " + to_string(node_id_) + ", proposed_value: "
+          + proposal_->value + " }";
+    }
+    return "{ node_id: " + to_string(node_id_) + " }";
   }
 
 
@@ -54,12 +64,14 @@ namespace paxos {
         // Stub the networking layer.
         const auto& promise = node->HandleProposal(shared_from_this(),
             *proposal_);
+        cout << this->ToString() << " PROPOSED " << node->ToString() << endl;
 
         if (!promise) {
           continue;
         }
 
         if (promise->accepted) {
+          cout << node->ToString() << " PROMISED " << this->ToString() << endl;
           acceptedNodes.push_back(node);
 
           if (promise->acceptReq
@@ -73,6 +85,10 @@ namespace paxos {
 
       // Achieved quoram. Move to ACCEPT PHASE.
       if (acceptedNodes.size() >= quoram) {
+        cout << this->ToString()
+            << " achieved quoram in PROPOSE phase. Moving to ACCEPT phase"
+            << endl;
+
         if (highestAcceptedGeneration > GetGeneration())
         // Update my value to match the largest generation that was accepted.
         SetProposalValue(potentialValueToAdopt);
@@ -121,8 +137,12 @@ namespace paxos {
       // Stub the networking layer.
       const auto& acceptResponse =
           acceptedNode->HandleAcceptReq(shared_from_this(), acceptReq);
+      cout << this->ToString() << " requested ACCEPT from "
+          << acceptedNode->ToString() << endl;
 
       if (acceptResponse && acceptResponse->accepted) {
+        cout << acceptedNode->ToString() << " ACCEPTED " << this->ToString()
+            << endl;
         acceptedCount++;
       }
     }
@@ -190,7 +210,7 @@ int main() {
 
     while (!committedValue) {
       cout << "Paxos consensus not achieved yet..." << endl;
-      sleep_for(seconds(1));
+      sleep_for(seconds(2));
       committedValue = paxos::NodeRegistry::GetCommittedValue();
     }
     cout << "Paxos consensus achieved; value committed: " << *committedValue
