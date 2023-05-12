@@ -6,7 +6,7 @@ A zero-setup, zero-dependency, single-process implementation of the Paxos algori
 
 1. No external dependencies.
 2. Runs in a single process. Nodes are simulated via multi-threading.
-3. The network layer is completely stubbed. Network delays and paritions are simulated in code.
+3. The network layer is completely stubbed. Network delays and partitions are simulated in code.
 4. The cluster configuration (number of nodes, number of proposers, network conditions, etc) can be changed to run and observe Paxos in different conditions.
 
 ## Usage
@@ -29,8 +29,8 @@ codzilla@hogwarts:~/Projects/paxos-playground$ ./paxos_exec
 ## Sample Run
 
 ```console
-codzilla@hogwarts:~/Projects/paxos$ ./build.sh
-codzilla@hogwarts:~/Projects/paxos$ ./paxos_exec
+codzilla@hogwarts:~/Projects/paxos-playground$ ./build.sh
+codzilla@hogwarts:~/Projects/paxos-playground$ ./paxos_exec
 Created Node with id: 1 , Generation Clock value: 0
 Created Node with id: 2 , Generation Clock value: 1
 Created Node with id: 3 , Generation Clock value: 2
