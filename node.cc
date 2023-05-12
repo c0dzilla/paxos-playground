@@ -40,47 +40,48 @@ namespace paxos {
 
 
   void Node::Propose() {
-    if (!proposal_) {
-      return;
-    }
-    // Begin PROPOSE PHASE.
-    const auto& nodes =  NodeRegistry::Get();
-    const int quoram = nodes.size() / 2 + 1;
-    vector<shared_ptr<Node>> acceptedNodes;
-    Generation highestAcceptedGeneration = make_pair(INT_MIN, INT_MIN);
-    string potentialValueToAdopt;
+    // Endlessly loop until if have a proposal for the cluster and have not yet
+    // committed to a value.
+    while (proposal_ && !committed_value_) {
+      // Begin PROPOSE PHASE.
+      const auto& nodes =  NodeRegistry::Get();
+      const int quoram = nodes.size() / 2 + 1;
+      vector<shared_ptr<Node>> acceptedNodes;
+      Generation highestAcceptedGeneration = make_pair(INT_MIN, INT_MIN);
+      string potentialValueToAdopt;
 
-    for (const auto& node : nodes) {
-      // Stub the networking layer.
-      const auto& promise = node->HandleProposal(shared_from_this(),
-          *proposal_);
+      for (const auto& node : nodes) {
+        // Stub the networking layer.
+        const auto& promise = node->HandleProposal(shared_from_this(),
+            *proposal_);
 
-      if (!promise) {
-        continue;
-      }
-
-      if (promise->accepted) {
-        acceptedNodes.push_back(node);
-
-        if (promise->acceptReq
-            && promise->acceptReq->generation > highestAcceptedGeneration) {
-          highestAcceptedGeneration = promise->acceptReq->generation;
-          potentialValueToAdopt = promise->acceptReq->value;
+        if (!promise) {
+          continue;
         }
 
+        if (promise->accepted) {
+          acceptedNodes.push_back(node);
+
+          if (promise->acceptReq
+              && promise->acceptReq->generation > highestAcceptedGeneration) {
+            highestAcceptedGeneration = promise->acceptReq->generation;
+            potentialValueToAdopt = promise->acceptReq->value;
+          }
+
+        }
       }
-    }
 
-    // Achieved quoram. Move to ACCEPT PHASE.
-    if (acceptedNodes.size() >= quoram) {
-      if (highestAcceptedGeneration > GetGeneration())
-      // Update my value to match the largest generation that was accepted.
-      SetProposalValue(potentialValueToAdopt);
+      // Achieved quoram. Move to ACCEPT PHASE.
+      if (acceptedNodes.size() >= quoram) {
+        if (highestAcceptedGeneration > GetGeneration())
+        // Update my value to match the largest generation that was accepted.
+        SetProposalValue(potentialValueToAdopt);
 
-      AcceptReq acceptReq;
-      acceptReq.generation = GetGeneration();
-      acceptReq.value = proposal_->value;
-      SendAcceptReqs(acceptedNodes, acceptReq);
+        AcceptReq acceptReq;
+        acceptReq.generation = GetGeneration();
+        acceptReq.value = proposal_->value;
+        SendAcceptReqs(acceptedNodes, acceptReq);
+      }
     }
   }
 
@@ -89,6 +90,10 @@ namespace paxos {
       Proposal proposal) {
     // Simulate random network delay.
     sleep_for(seconds(GenerationClock::Get() % 7));
+    // Simulate random network partition.
+    if (GenerationClock::Get() % 11 == 0) {
+      return nullptr;
+    }
 
     if (!promised_generation_) {
       return make_shared<Promise>(true, nullptr);
@@ -123,11 +128,9 @@ namespace paxos {
     }
 
     if (acceptedCount >= quoram) {
-      // Send this proposal as a COMMIT to all nodes.
-      assert(proposal_ != nullptr);
-
+      // Send the accepted value as a COMMIT to all nodes.
       for (const auto& node : NodeRegistry::Get()) {
-        node->Commit(proposal_->value);
+        node->Commit(acceptReq.value);
       }
     }
   }
@@ -137,6 +140,10 @@ namespace paxos {
       shared_ptr<Node> acceptRequester, AcceptReq acceptReq) {
     // Simulate random network delay.
     sleep_for(seconds(GenerationClock::Get() % 7));
+    // Simulate random network partition.
+    if (GenerationClock::Get() % 11 == 0) {
+      return nullptr;
+    }
     // Accept the request if its generation is >= the highest generation that
     // has been promised so far. Theoretically, checking for = should be
     // sufficient, since the accept request's generation cannot be higher than
