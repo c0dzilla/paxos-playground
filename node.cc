@@ -2,8 +2,11 @@
 #include <iostream>
 #include <vector>
 #include "node.h"
+#include "node_registry.h"
 
+using ::std::atomic_int;
 using ::std::cout;
+using ::std::endl;
 using ::std::make_pair;
 using ::std::make_shared;
 using ::std::shared_ptr;
@@ -12,10 +15,13 @@ using ::std::vector;
 
 namespace paxos {
 
+  atomic_int GenerationClock::epoch_{0};
+
   Node::Node(int node_id) {
     node_id_ = node_id;
     generation_clock_val_ = GenerationClock::Get();
-    cout << generation_clock_val_ << std::endl;
+    cout << "Created Node with id: " << node_id <<
+        " , Generation Clock value: " << generation_clock_val_ << std::endl;
   }
 
 
@@ -138,12 +144,18 @@ namespace paxos {
     return make_shared<AcceptResponse>(false);
   }
 
+
   void Node::Commit(string value) {
     if (!committed_value_) {
       committed_value_ = make_shared<string>(value);
     } else {
       *committed_value_ = value;
     }
+  }
+
+
+  shared_ptr<string> Node::GetCommittedValue() {
+    return committed_value_;
   }
 
 }
@@ -156,5 +168,16 @@ int main() {
   const auto& node4 = paxos::NodeRegistry::Register(4);
   const auto& node5 = paxos::NodeRegistry::Register(5);
 
+  node1->SetProposalValue("alice");
+  node1->Propose();
+
+  const auto& committedValue = paxos::NodeRegistry::GetCommittedValue();
+
+  if (!committedValue) {
+    cout << "Paxos consensus not achieved" << endl;
+  } else {
+    cout << "Paxos consensus achieved; value committed: " << *committedValue
+        << endl;
+  }
   return 0;
 }

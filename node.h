@@ -1,3 +1,5 @@
+#pragma once
+
 #include <atomic>
 #include <climits>
 #include <memory>
@@ -9,7 +11,7 @@ namespace paxos {
 
   typedef std::pair<int, int> Generation;
 
-  bool operator<(const Generation& g1, const Generation& g2) {
+  inline bool operator<(const Generation& g1, const Generation& g2) {
     if (g1.first == g2.first) {
       return g1.second > g2.second;
     }
@@ -20,7 +22,7 @@ namespace paxos {
     Generation generation;
     // The `value` is needed only in the AcceptReq, and not in the Proposal.
     // This is because the value is not read during the PROPOSE-PROMISE phase.
-    // But for simplicity, let's keep AcceptReq and Proposal msgs similar.
+    // But for simplicity, let's keep the AcceptReq and Proposal msgs similar.
     std::string value;
   };
 
@@ -50,8 +52,6 @@ namespace paxos {
      static std::atomic_int epoch_;
   };
 
-  std::atomic_int GenerationClock::epoch_{0};
-
   class Node : public std::enable_shared_from_this<Node> {
 
     public:
@@ -59,10 +59,12 @@ namespace paxos {
 
      void SetProposalValue(std::string value);
 
+     void Propose();
+
+     std::shared_ptr<std::string> GetCommittedValue();
+
     private:
      Node();
-
-     void Propose();
 
      std::shared_ptr<Promise> HandleProposal(std::shared_ptr<Node> proposer,
          Proposal proposal);
@@ -94,23 +96,4 @@ namespace paxos {
 
      std::shared_ptr<std::string> committed_value_ = nullptr;
   };
-
-  class NodeRegistry {
-
-    public:
-     static std::shared_ptr<Node> Register(int nodeId) {
-      const auto& node = std::make_shared<Node>(nodeId);
-       nodes_.insert(node);
-       return node;
-     }
-
-     static std::unordered_set<std::shared_ptr<Node>> Get() {
-      return nodes_;
-     }
-
-    private:
-     static std::unordered_set<std::shared_ptr<Node>> nodes_;
-  };
-
-  std::unordered_set<std::shared_ptr<Node>> NodeRegistry::nodes_;
 }
