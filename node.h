@@ -3,6 +3,7 @@
 #include <atomic>
 #include <climits>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -100,5 +101,9 @@ namespace paxos {
      std::shared_ptr<AcceptReq> accepted_req_ = nullptr;
 
      std::shared_ptr<std::string> committed_value_ = nullptr;
+
+     std::mutex handle_proposal_mutex_;
+
+     std::mutex handle_accept_req_mutex_;
   };
 }

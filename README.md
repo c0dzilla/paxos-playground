@@ -36,66 +36,56 @@ Created Node with id: 2 , Generation Clock value: 1
 Created Node with id: 3 , Generation Clock value: 2
 Created Node with id: 4 , Generation Clock value: 3
 Created Node with id: 5 , Generation Clock value: 4
-Paxos consensus not achieved yet...
-Paxos consensus not achieved yet...
-Paxos consensus not achieved yet...
-{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } PROMISED { node_id: 2, proposed_value: bob }
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 1, proposed_value: alice }
-{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 2, proposed_value: bob }
-Paxos consensus not achieved yet...
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 2, proposed_value: bob }
-{ node_id: 2, proposed_value: bob } PROMISED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 3 }
-{ node_id: 3 } PROMISED { node_id: 1, proposed_value: alice }
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 5 }
-{ node_id: 5 } PROMISED { node_id: 1, proposed_value: alice }
-{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 3 }
-{ node_id: 3 } PROMISED { node_id: 2, proposed_value: bob }
-Paxos consensus not achieved yet...
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 4 }
-{ node_id: 4 } PROMISED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } achieved quoram in PROPOSE phase. Moving to ACCEPT phase
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 2, proposed_value: bob }
-{ node_id: 2, proposed_value: bob } ACCEPTED { node_id: 1, proposed_value: alice }
-Paxos consensus not achieved yet...
-{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 5 }
-{ node_id: 5 } PROMISED { node_id: 2, proposed_value: bob }
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 3 }
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 5 }
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } requested ACCEPT from { node_id: 4 }
-{ node_id: 4 } ACCEPTED { node_id: 1, proposed_value: alice }
-{ node_id: 2, proposed_value: bob } PROPOSED { node_id: 4 }
-{ node_id: 2, proposed_value: bob } achieved quoram in PROPOSE phase. Moving to ACCEPT phase
-Paxos consensus not achieved yet...
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 2, proposed_value: bob }
-Paxos consensus not achieved yet...
-{ node_id: 2, proposed_value: bob } requested ACCEPT from { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } ACCEPTED { node_id: 2, proposed_value: bob }
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 3 }
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 5 }
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 4 }
-Paxos consensus not achieved yet...
-{ node_id: 2, proposed_value: bob } requested ACCEPT from { node_id: 3 }
-{ node_id: 3 } ACCEPTED { node_id: 2, proposed_value: bob }
-Paxos consensus not achieved yet...
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 1, proposed_value: alice }
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 2, proposed_value: bob }
-Paxos consensus not achieved yet...
-Paxos consensus not achieved yet...
-{ node_id: 2, proposed_value: bob } requested ACCEPT from { node_id: 5 }
-{ node_id: 5 } ACCEPTED { node_id: 2, proposed_value: bob }
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 3 }
-Paxos consensus achieved; value committed: bob
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 5 }
-{ node_id: 1, proposed_value: alice } PROPOSED { node_id: 4 }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } PROPOSED { node_id: 5, generation_clock_val: 4 }
+{ node_id: 5, generation_clock_val: 4 } PROMISED { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } PROPOSED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } DID NOT PROMISE { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } PROPOSED { node_id: 5, generation_clock_val: 4 }
+{ node_id: 5, generation_clock_val: 4 } PROMISED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } PROPOSED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } PROMISED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } PROPOSED { node_id: 3, generation_clock_val: 2 }
+{ node_id: 3, generation_clock_val: 2 } PROMISED { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } PROPOSED { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } PROMISED { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } PROPOSED { node_id: 3, generation_clock_val: 2 }
+{ node_id: 3, generation_clock_val: 2 } PROMISED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } PROPOSED { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } PROMISED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } PROPOSED { node_id: 4, generation_clock_val: 3 }
+{ node_id: 4, generation_clock_val: 3 } PROMISED { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } achieved quoram in PROPOSE phase. Moving to ACCEPT phase...
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } requested ACCEPT from { node_id: 5, generation_clock_val: 4 }
+{ node_id: 5, generation_clock_val: 4 } DID NOT ACCEPT { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } requested ACCEPT from { node_id: 3, generation_clock_val: 2 }
+{ node_id: 3, generation_clock_val: 2 } DID NOT ACCEPT { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } PROPOSED { node_id: 4, generation_clock_val: 3 }
+{ node_id: 4, generation_clock_val: 3 } PROMISED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } achieved quoram in PROPOSE phase. Moving to ACCEPT phase...
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } requested ACCEPT from { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } DID NOT ACCEPT { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } requested ACCEPT from { node_id: 5, generation_clock_val: 4 }
+{ node_id: 5, generation_clock_val: 4 } ACCEPTED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } requested ACCEPT from { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } ACCEPTED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 2, generation_clock_val: 5, proposed_value: bob } requested ACCEPT from { node_id: 4, generation_clock_val: 3 }
+{ node_id: 4, generation_clock_val: 3 } DID NOT ACCEPT { node_id: 2, generation_clock_val: 5, proposed_value: bob }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } requested ACCEPT from { node_id: 3, generation_clock_val: 2 }
+{ node_id: 3, generation_clock_val: 2 } ACCEPTED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } requested ACCEPT from { node_id: 2, generation_clock_val: 40, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 40, proposed_value: bob } DID NOT ACCEPT { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } requested ACCEPT from { node_id: 4, generation_clock_val: 3 }
+{ node_id: 4, generation_clock_val: 3 } ACCEPTED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } achieved quoram in ACCEPT phase. Sending COMMIT to all nodes...
+{ node_id: 2, generation_clock_val: 40, proposed_value: bob } PROPOSED { node_id: 5, generation_clock_val: 4 }
+{ node_id: 5, generation_clock_val: 4 } DID NOT PROMISE { node_id: 2, generation_clock_val: 40, proposed_value: bob }
+Paxos consensus achieved; value committed: alice
+{ node_id: 2, generation_clock_val: 40, proposed_value: bob } PROPOSED { node_id: 1, generation_clock_val: 7, proposed_value: alice }
+{ node_id: 1, generation_clock_val: 7, proposed_value: alice } DID NOT PROMISE { node_id: 2, generation_clock_val: 40, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 40, proposed_value: bob } PROPOSED { node_id: 3, generation_clock_val: 2 }
+{ node_id: 3, generation_clock_val: 2 } DID NOT PROMISE { node_id: 2, generation_clock_val: 40, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 40, proposed_value: bob } PROPOSED { node_id: 2, generation_clock_val: 40, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 40, proposed_value: bob } DID NOT PROMISE { node_id: 2, generation_clock_val: 40, proposed_value: bob }
+{ node_id: 2, generation_clock_val: 40, proposed_value: bob } PROPOSED { node_id: 4, generation_clock_val: 3 }
+{ node_id: 4, generation_clock_val: 3 } DID NOT PROMISE { node_id: 2, generation_clock_val: 40, proposed_value: bob }
 ```

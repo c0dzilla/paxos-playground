@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <chrono>
 #include <iostream>
+#include <mutex>
 #include <thread>
 #include <vector>
 #include "node.h"
@@ -10,8 +11,10 @@ using ::std::atomic_int;
 using ::std::chrono::seconds;
 using ::std::cout;
 using ::std::endl;
+using ::std::lock_guard;
 using ::std::make_pair;
 using ::std::make_shared;
+using ::std::mutex;
 using ::std::shared_ptr;
 using ::std::string;
 using ::std::this_thread::sleep_for;
@@ -33,10 +36,12 @@ namespace paxos {
 
   string Node::ToString() {
     if (proposal_) {
-      return "{ node_id: " + to_string(node_id_) + ", proposed_value: "
-          + proposal_->value + " }";
+      return "{ node_id: " + to_string(node_id_) + ", generation_clock_val: "
+          + to_string(generation_clock_val_) + ", proposed_value: "
+              + proposal_->value + " }";
     }
-    return "{ node_id: " + to_string(node_id_) + " }";
+    return "{ node_id: " + to_string(node_id_) + ", generation_clock_val: "
+        + to_string(generation_clock_val_)  + " }";
   }
 
 
@@ -77,27 +82,25 @@ namespace paxos {
             *proposal_);
         cout << this->ToString() << " PROPOSED " << node->ToString() << endl;
 
-        if (!promise) {
+        if (!promise || !promise->accepted) {
+          cout << node->ToString() << " DID NOT PROMISE " << this->ToString()
+              << endl;
           continue;
         }
+        cout << node->ToString() << " PROMISED " << this->ToString() << endl;
+        acceptedNodes.push_back(node);
 
-        if (promise->accepted) {
-          cout << node->ToString() << " PROMISED " << this->ToString() << endl;
-          acceptedNodes.push_back(node);
-
-          if (promise->acceptReq
-              && promise->acceptReq->generation > highestAcceptedGeneration) {
-            highestAcceptedGeneration = promise->acceptReq->generation;
-            potentialValueToAdopt = promise->acceptReq->value;
-          }
-
+        if (promise->acceptReq
+            && promise->acceptReq->generation > highestAcceptedGeneration) {
+          highestAcceptedGeneration = promise->acceptReq->generation;
+          potentialValueToAdopt = promise->acceptReq->value;
         }
       }
 
       // Achieved quoram. Move to ACCEPT PHASE.
       if (acceptedNodes.size() >= quoram) {
         cout << this->ToString()
-            << " achieved quoram in PROPOSE phase. Moving to ACCEPT phase"
+            << " achieved quoram in PROPOSE phase. Moving to ACCEPT phase..."
             << endl;
 
         if (highestAcceptedGeneration > GetGeneration())
@@ -115,10 +118,19 @@ namespace paxos {
 
   shared_ptr<Promise> Node::HandleProposal(shared_ptr<Node> proposer,
       Proposal proposal) {
+    // Obtain mutex so that PROPOSAL processing is serialized.
+    const lock_guard<mutex> lock(handle_proposal_mutex_);
+
     // Simulate random network delay.
     sleep_for(seconds(GenerationClock::Get() % 7));
+
     // Simulate random network partition.
     if (GenerationClock::Get() % 11 == 0) {
+      return nullptr;
+    }
+
+    if (committed_value_) {
+      // Already committed to a value, so cannot PROMISE.
       return nullptr;
     }
 
@@ -146,21 +158,27 @@ namespace paxos {
     const int quoram = nodes.size() / 2 + 1;
     int acceptedCount = 0;
 
-    for (const auto& acceptedNode : nodes) {
+    for (const auto& promisedNode : nodes) {
       // Stub the networking layer.
       const auto& acceptResponse =
-          acceptedNode->HandleAcceptReq(shared_from_this(), acceptReq);
+          promisedNode->HandleAcceptReq(shared_from_this(), acceptReq);
       cout << this->ToString() << " requested ACCEPT from "
-          << acceptedNode->ToString() << endl;
+          << promisedNode->ToString() << endl;
 
       if (acceptResponse && acceptResponse->accepted) {
-        cout << acceptedNode->ToString() << " ACCEPTED " << this->ToString()
+        cout << promisedNode->ToString() << " ACCEPTED " << this->ToString()
             << endl;
         acceptedCount++;
+      } else {
+        cout << promisedNode->ToString() << " DID NOT ACCEPT "
+            << this->ToString() << endl;
       }
     }
 
     if (acceptedCount >= quoram) {
+      cout << this->ToString()
+          << " achieved quoram in ACCEPT phase. Sending COMMIT to all nodes..."
+          << endl;
       // Send the accepted value as a COMMIT to all nodes.
       for (const auto& node : NodeRegistry::Get()) {
         node->Commit(acceptReq.value);
@@ -171,10 +189,19 @@ namespace paxos {
 
   shared_ptr<AcceptResponse> Node::HandleAcceptReq(
       shared_ptr<Node> acceptRequester, AcceptReq acceptReq) {
+    // Obtain mutex so that ACCEPT processing is serialized.
+    const lock_guard<mutex> lock(handle_accept_req_mutex_);
+
     // Simulate random network delay.
     sleep_for(seconds(GenerationClock::Get() % 7));
+
     // Simulate random network partition.
     if (GenerationClock::Get() % 11 == 0) {
+      return nullptr;
+    }
+
+    if (committed_value_) {
+      // Already committed to a value, so cannot ACCEPT.
       return nullptr;
     }
     // Accept the request if its generation is >= the highest generation that
@@ -222,7 +249,7 @@ int main() {
     shared_ptr<string> committedValue = nullptr;
 
     while (!committedValue) {
-      cout << "Paxos consensus not achieved yet..." << endl;
+      // Paxos consensus not achieved yet.
       sleep_for(seconds(2));
       committedValue = paxos::NodeRegistry::GetCommittedValue();
     }
