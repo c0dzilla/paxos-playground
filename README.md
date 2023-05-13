@@ -19,7 +19,7 @@ codzilla@hogwarts:~/Projects/paxos-playground$ ./build.sh
 ```console
 codzilla@hogwarts:~/Projects/paxos-playground$ ./paxos_exec
 ```
-3. (Optional) If you wish to play with cluster configurations, the `main` entry-point is defined in *node.cc*. It has a demo configuration of 5 nodes and 2 proposers. The network delays and node partitions are simulated inside `Node::HandleProposal` and `Node::SendAcceptReqs`.
+3. (Optional) If you wish to play with cluster configurations, the `main` entry-point is defined in *node.cc*. It has a demo configuration of 5 nodes and 2 proposers. The network delays and node partitions are simulated inside `Node::HandleProposal` and `Node::HandleAcceptReqs`.
 
 ## Credits
 
