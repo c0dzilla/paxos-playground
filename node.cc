@@ -49,10 +49,21 @@ namespace paxos {
   }
 
 
+  void Node::RefreshProposal() {
+    if (proposal_) {
+      generation_clock_val_ = GenerationClock::Get();
+      proposal_->generation = GetGeneration();
+    }
+  }
+
+
   void Node::Propose() {
     // Endlessly loop until if have a proposal for the cluster and have not yet
     // committed to a value.
     while (proposal_ && !committed_value_) {
+      // Obtain a fresh generation before every PROPOSAL attempt.
+      RefreshProposal();
+
       // Begin PROPOSE PHASE.
       const auto& nodes =  NodeRegistry::Get();
       const int quoram = nodes.size() / 2 + 1;
@@ -112,6 +123,8 @@ namespace paxos {
     }
 
     if (!promised_generation_) {
+      promised_generation_ = make_shared<Generation>();
+      *promised_generation_ = proposal.generation;
       return make_shared<Promise>(true, nullptr);
     }
 

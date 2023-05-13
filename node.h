@@ -68,6 +68,9 @@ namespace paxos {
     private:
      Node();
 
+     // Refresh proposal_ (if set) by obtaining a new generation_clock_val_.
+     void RefreshProposal();
+
      std::shared_ptr<Promise> HandleProposal(std::shared_ptr<Node> proposer,
          Proposal proposal);
 
